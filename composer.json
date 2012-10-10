@@ -15,7 +15,7 @@
     "require": {},
     "autoload": {
         "psr-0": {
-            "Themattharris" : "src"
+            "Themattharris" : "src/"
         }
     }
 }
