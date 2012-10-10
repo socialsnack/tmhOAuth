@@ -11,7 +11,7 @@
  *
  * 04 September 2012
  */
-class tmhOAuth {
+class TmhOAuth {
   const VERSION = '0.7.0';
 
   var $response = array();

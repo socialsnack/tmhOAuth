@@ -9,7 +9,7 @@
  *
  * 04 September 2012
  */
-class tmhUtilities {
+class TmhUtilities {
   const VERSION = '0.5.0';
   /**
    * Entifies the tweet using the given entities element.
