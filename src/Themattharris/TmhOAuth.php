@@ -11,6 +11,9 @@
  *
  * 04 September 2012
  */
+
+namespace Themattharris;
+
 class TmhOAuth {
   const VERSION = '0.7.0';
 

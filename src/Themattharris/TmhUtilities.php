@@ -9,6 +9,9 @@
  *
  * 04 September 2012
  */
+
+namespace Themattharris;
+
 class TmhUtilities {
   const VERSION = '0.5.0';
   /**
