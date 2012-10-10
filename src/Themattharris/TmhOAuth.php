@@ -664,7 +664,7 @@ class TmhOAuth {
 
     // store the response
     $this->response['code'] = $code;
-    $this->response['response'] = $response;
+    $this->response['response'] = json_decode($response,true);
     $this->response['info'] = $info;
     $this->response['error'] = $error;
     $this->response['errno'] = $errno;
@@ -686,9 +686,9 @@ class TmhOAuth {
 /**
  * Thrown when an API call returns an exception.
  *
- * @author Naitik Shah <naitik@facebook.com>
+ * @author Antoine Guiral <antoine@socialsnack.com>
  */
-class TwitterApiException extends Exception
+class TwitterApiException extends \Exception
 {
   /**
    * The result from the API server that represents the exception information.
@@ -703,21 +703,23 @@ class TwitterApiException extends Exception
   public function __construct($result) {
     $this->result = $result;
 
-    $code = isset($result['error_code']) ? $result['error_code'] : 0;
-
-    if (isset($result['error_description'])) {
-      // OAuth 2.0 Draft 10 style
-      $msg = $result['error_description'];
-    } else if (isset($result['error']) && is_array($result['error'])) {
-      // OAuth 2.0 Draft 00 style
-      $msg = $result['error']['message'];
-    } else if (isset($result['error_msg'])) {
-      // Rest server style
-      $msg = $result['error_msg'];
-    } else {
+    $code = isset($result['code']) ? $result['code'] : 0;
+    
+    if (isset($result['response'])) {
+        if (isset($result['response']['error'])) {
+            $msg = $result['response']['error'];
+        }elseif (isset($result['response']['errors'])) {
+            $msg = '';
+            foreach($result['response']['errors'] as $e){
+                $msg .= $e['code'].' : '.$e['message'].PHP_EOL;
+            }
+            
+        }
+        
+      
+    }  else {
       $msg = 'Unknown Error. Check getResult()';
     }
-
     parent::__construct($msg, $code);
   }
 
@@ -730,28 +732,7 @@ class TwitterApiException extends Exception
     return $this->result;
   }
 
-  /**
-   * Returns the associated type for the error. This will default to
-   * 'Exception' when a type is not available.
-   *
-   * @return string
-   */
-  public function getType() {
-    if (isset($this->result['error'])) {
-      $error = $this->result['error'];
-      if (is_string($error)) {
-        // OAuth 2.0 Draft 10 style
-        return $error;
-      } else if (is_array($error)) {
-        // OAuth 2.0 Draft 00 style
-        if (isset($error['type'])) {
-          return $error['type'];
-        }
-      }
-    }
-
-    return 'Exception';
-  }
+  
 
   /**
    * To make debugging easier.
@@ -759,7 +740,7 @@ class TwitterApiException extends Exception
    * @return string The string representation of the error
    */
   public function __toString() {
-    $str = $this->getType() . ': ';
+    $str = '';
     if ($this->code != 0) {
       $str .= $this->code . ': ';
     }
